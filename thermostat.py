@@ -80,9 +80,20 @@ class data:
     system_mode = "Auto"
 
 class settings:
+    valid_modes = ["Off","Auto","Heat","Cool","Vent","Aux"]
     operating_mode = "Auto"
     heating_setpoint = 70.0
     cooling_setpoint = 78.0
+    @classmethod
+    def set_mode(self,mode=None):
+        if mode in self.valid_modes:
+            self.operating_mode = mode
+        else:
+            n = self.valid_modes.index(self.operating_mode) + 1
+            if n == len(self.valid_modes): n = 0
+            self.operating_mode = self.valid_modes[n]
+        debug(f"setting.set_mode(mode={mode}): mode = {self.operating_mode}")
+        main.update()
 
 current_button = None
 def enable_buttons(disable=[]):
@@ -109,12 +120,22 @@ class main:
         },
         "system_mode" : {
             "item" : None,
-            "type" : tk.Button,
+            "type" : tk.Label,
             "source" : "data.system_mode",
+            "format" : "%s",
+            "font" : ("Arial",24),
+            "x" : 50,
+            "y" : 200,
+        },
+        "operating_mode" : {
+            "item" : None,
+            "type" : tk.Button,
+            "source" : "settings.operating_mode",
             "format" : "%s",
             "font" : ("Arial",36),
             "x" : 50,
-            "y" : 200,
+            "y" : 250,
+            "command" : "settings.set_mode",
         },
         "current_datetime" :
         {
@@ -184,6 +205,8 @@ class main:
                 layout["item"]["text"] = layout["format"] % eval(layout["source"])
                 layout["item"]["font"] = layout["font"]
                 layout["item"].place(x=layout["x"],y=layout["y"])
+                if "command" in layout.keys():
+                    layout["item"]["command"] = eval(layout["command"])
             except Exception as err:
                 debug(f"exception context: {name} = {layout}")
                 raise
@@ -191,7 +214,12 @@ class main:
     @classmethod
     def update(self):
         debug("updating main",2)
-        pass
+        for name, layout in self.layout_data.items():
+            try:
+                layout["item"]["text"] = layout["format"] % eval(layout["source"])
+            except Exception as err:
+                debug(f"exception context: {name} = {layout}")
+                raise
 
 class setup:
 
