@@ -11,7 +11,7 @@ class config:
     button_foreground = None
     button_background_active = None
     button_foreground_active = None
-    button_interval = 80
+    button_interval = 100
 
     noaa_server = "https://api.weather.gov/points/{latitude},{longitude}"
     noaa_user_agent = "(gridlabd.us, gridlabd@gmail.com)"
@@ -115,8 +115,8 @@ class main:
             "source" : "data.indoor_temperature",
             "format" : "%.0f",
             "font" : ("Arial",144),
-            "x" : 50,
-            "y" : 50,
+            "x" : 25,
+            "y" : 60,
         },
         "system_mode" : {
             "item" : None,
@@ -124,8 +124,8 @@ class main:
             "source" : "data.system_mode",
             "format" : "%s",
             "font" : ("Arial",24),
-            "x" : 50,
-            "y" : 200,
+            "x" : 25,
+            "y" : 240,
         },
         "operating_mode" : {
             "item" : None,
@@ -133,15 +133,15 @@ class main:
             "source" : "settings.operating_mode",
             "format" : "%s",
             "font" : ("Arial",36),
-            "x" : 50,
-            "y" : 250,
+            "x" : 25,
+            "y" : 280,
             "command" : "settings.set_mode",
         },
         "current_datetime" :
         {
             "item" : None,
             "type" : tk.Label,
-            "source" : "datetime.datetime.now().strftime('%A, %B %d, %Y %I:%M %PM')",
+            "source" : "datetime.datetime.now().strftime('%A, %B %d, %Y %I:%M %p')",
             "format" : "%s",
             "font" : ("Arial",20),
             "x" : 300,
@@ -172,7 +172,7 @@ class main:
             "format" : "%s",
             "font" : ("Arial",36),
             "x" : 300,
-            "y" : 150,
+            "y" : 160,
         },
     }
 
