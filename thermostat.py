@@ -1,5 +1,8 @@
 import sys, os
 import tkinter as tk
+import urllib.request
+import io
+from PIL import ImageTk, Image
 
 class config:
     debug = True
@@ -63,7 +66,7 @@ class noaa:
             url = config.noaa_server.format(latitude=location_info.latlng[0],longitude=location_info.latlng[1])
             headers = {'User-agent' : config.noaa_user_agent}
             location = json.loads(requests.get(url,headers=headers).content.decode("utf-8"))
-            self.raw = json.loads(requests.get(location["properties"]["forecast"],headers=headers).content.decode("utf-8"))
+            self.raw = json.loads(requests.get(location["properties"]["forecastHourly"],headers=headers).content.decode("utf-8"))
             refresh = True
         if refresh:
             data = self.raw["properties"]["periods"][0]
@@ -77,7 +80,7 @@ class noaa:
 
 class data:
     indoor_temperature = 72.0
-    system_mode = "Auto"
+    system_mode = "Off"
 
 class settings:
     valid_modes = ["Off","Auto","Heat","Cool","Vent","Aux"]
@@ -94,6 +97,16 @@ class settings:
             self.operating_mode = self.valid_modes[n]
         debug(f"setting.set_mode(mode={mode}): mode = {self.operating_mode}")
         main.update()
+
+class image:
+    def __init__(self, url):
+        with urllib.request.urlopen(url) as u:
+            raw_data = u.read()
+        img = Image.open(io.BytesIO(raw_data))
+        self.image = ImageTk.PhotoImage(img)
+
+    def get(self):
+        return self.image
 
 current_button = None
 def enable_buttons(disable=[]):
@@ -174,6 +187,13 @@ class main:
             "x" : 300,
             "y" : 160,
         },
+        "outdoor_image" : {
+            "item" : None,
+            "type" : tk.Canvas,
+            "image" : "https://api.weather.gov/icons/land/day/bkn?size=medium",
+            "x" : 300,
+            "y" : 220,
+        }
     }
 
     def __init__(self,top=None):
@@ -201,9 +221,13 @@ class main:
         debug("laying out main",2)
         for name, layout in self.layout_data.items():
             try:
-                layout["item"] = layout["type"]()
-                layout["item"]["text"] = layout["format"] % eval(layout["source"])
-                layout["item"]["font"] = layout["font"]
+                layout["item"] = layout["type"](self.top)
+                if "format" in layout.keys() and "source" in layout.keys():
+                    layout["item"]["text"] = layout["format"] % eval(layout["source"])
+                if "image" in layout.keys():
+                    layout["item"].create_image(10,10,anchor="nw",image=image(layout["image"]).get())
+                if "font" in layout.keys():
+                    layout["item"]["font"] = layout["font"]
                 layout["item"].place(x=layout["x"],y=layout["y"])
                 if "command" in layout.keys():
                     layout["item"]["command"] = eval(layout["command"])
@@ -216,7 +240,10 @@ class main:
         debug("updating main",2)
         for name, layout in self.layout_data.items():
             try:
-                layout["item"]["text"] = layout["format"] % eval(layout["source"])
+                if "format" in layout.keys() and "source" in layout.keys():
+                    layout["item"]["text"] = layout["format"] % eval(layout["source"])
+                if "image" in layout.keys():
+                    layout["item"].create_image(10,10,anchor="nw",image=image(layout["image"]).get())
             except Exception as err:
                 debug(f"exception context: {name} = {layout}")
                 raise
