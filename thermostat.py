@@ -158,7 +158,7 @@ class main:
         {
             "item" : None,
             "type" : tk.Label,
-            "source" : "datetime.datetime.now().strftime('%A, %B %d, %Y %I:%M %p')",
+            "source" : "datetime.datetime.now().strftime('%A, %B %d, %Y %I:%M %p').replace(' 0',' ')",
             "format" : "%s",
             "font" : ("Arial",20),
             "x" : 300,
@@ -251,6 +251,8 @@ class main:
                     url = eval(layout["image"]).replace("small","large")
                     layout["item"].configure(image=image(url).get())
                     layout["item"].image = image(url).get()
+                sec = datetime.datetime.now().second
+                wnd.after((60-sec+1)*1000,self.update)
             except Exception as err:
                 debug(f"exception context: {name} = {layout}")
                 raise
