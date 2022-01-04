@@ -77,6 +77,9 @@ class noaa:
             self.temperature = data["temperature"]
             self.temperature_trend = data["temperatureTrend"]
             self.forecast_short = data["shortForecast"]
+            self.image = data["icon"]
+            self.wind_speed = data["windSpeed"]
+            self.wind_direction = data["windDirection"]
 
 class data:
     indoor_temperature = 72.0
@@ -104,6 +107,7 @@ class image:
             raw_data = u.read()
         img = Image.open(io.BytesIO(raw_data))
         self.image = ImageTk.PhotoImage(img)
+        debug(f"image url = '{url}', img = {img}")
 
     def get(self):
         return self.image
@@ -189,8 +193,8 @@ class main:
         },
         "outdoor_image" : {
             "item" : None,
-            "type" : tk.Canvas,
-            "image" : "https://api.weather.gov/icons/land/day/bkn?size=medium",
+            "type" : tk.Label,
+            "image" : "noaa().image",
             "x" : 300,
             "y" : 220,
         }
@@ -221,11 +225,12 @@ class main:
         debug("laying out main",2)
         for name, layout in self.layout_data.items():
             try:
-                layout["item"] = layout["type"](self.top)
                 if "format" in layout.keys() and "source" in layout.keys():
+                    layout["item"] = layout["type"](self.top)
                     layout["item"]["text"] = layout["format"] % eval(layout["source"])
                 if "image" in layout.keys():
-                    layout["item"].create_image(10,10,anchor="nw",image=image(layout["image"]).get())
+                    url = eval(layout["image"]).replace("small","large")
+                    layout["item"] = layout["type"](self.top,image=image(url).get())
                 if "font" in layout.keys():
                     layout["item"]["font"] = layout["font"]
                 layout["item"].place(x=layout["x"],y=layout["y"])
@@ -243,7 +248,9 @@ class main:
                 if "format" in layout.keys() and "source" in layout.keys():
                     layout["item"]["text"] = layout["format"] % eval(layout["source"])
                 if "image" in layout.keys():
-                    layout["item"].create_image(10,10,anchor="nw",image=image(layout["image"]).get())
+                    url = eval(layout["image"]).replace("small","large")
+                    layout["item"].configure(image=image(url).get())
+                    layout["item"].image = image(url).get()
             except Exception as err:
                 debug(f"exception context: {name} = {layout}")
                 raise
