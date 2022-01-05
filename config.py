@@ -13,5 +13,5 @@ class config:
     noaa_server = "https://api.weather.gov/points/{latitude},{longitude}"
     noaa_user_agent = "(gridlabd.us, gridlabd@gmail.com)"
 
-    location_name = "Redwood City, CA"
-    location_geo = [37.5,-122.3]
+    location_name = None # "Redwood City, CA"
+    location_geo = None # [37.5,-122.3]

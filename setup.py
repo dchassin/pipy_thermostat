@@ -9,7 +9,7 @@ class setup:
             debug("creating setup",2)
             self.top = top
         else:
-            setup.show()
+            self.show()
 
     @classmethod
     def show(self):
