@@ -7,6 +7,7 @@ location_info = location()
 
 class noaa:
 
+    error = None
     raw = None
     name = None
     datetime = None
@@ -25,11 +26,11 @@ class noaa:
 
     def __init__(self,refresh=False):
         if not self.raw or self.endtime < datetime.datetime.now() or refresh:
-            url = config.noaa_server.format(latitude=location_info.latlng[0],longitude=location_info.latlng[1])
+            url = config.noaa_server.format(latitude=location_info.latitude(),longitude=location_info.longitude())
             headers = {'User-agent' : config.noaa_user_agent}
             location = json.loads(requests.get(url,headers=headers).content.decode("utf-8"))
             self.raw = json.loads(requests.get(location["properties"]["forecastHourly"],headers=headers).content.decode("utf-8"))
-            debug(f"forecast for {location_info.latlng} from URL '{url}' is {self.raw}")
+            debug(f"forecast for {location_info.str()} from URL '{url}' is {self.raw}")
             try:
                 data = self.raw["properties"]["periods"][0]
                 self.name = data["name"]
