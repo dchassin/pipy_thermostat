@@ -16,7 +16,7 @@ class main:
             "type" : tk.Label,
             "source" : "data.indoor_temperature",
             "format" : "%.0f",
-            "font" : ("Arial",144),
+            "font" : ("Arial",128),
             "x" : 25,
             "y" : 60,
         },
